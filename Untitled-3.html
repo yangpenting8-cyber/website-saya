@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Data Excel</title>
+
+    <!-- Library untuk membaca Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #0d6efd;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Website Data Excel</h2>
+
+<input type="file" id="excelFile" />
+
+<br><br>
+
+<table id="dataTable"></table>
+
+<script>
+document.getElementById("excelFile").addEventListener("change", function(e) {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(e) {
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, { type: 'array' });
+
+        let sheetName = workbook.SheetNames[0];
+        let sheet = workbook.Sheets[sheetName];
+
+        let excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        let table = document.getElementById("dataTable");
+        table.innerHTML = "";
+
+        excelData.forEach((row, index) => {
+            let tr = document.createElement("tr");
+
+            row.forEach(cell => {
+                let cellElement = document.createElement(index === 0 ? "th" : "td");
+                cellElement.innerText = cell;
+                tr.appendChild(cellElement);
+            });
+
+            table.appendChild(tr);
+        });
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+</script>
+
+</body>
+</html>
